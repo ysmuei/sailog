@@ -37,7 +37,7 @@ export function Header({
       >
         {!dashboard && (
           <>
-            <a className="nav-link hidden sm:inline-flex" href="#how-it-works">
+            <a className="nav-link inline-flex" href="#how-it-works">
               이용 방법
             </a>
             <a className="nav-link hidden sm:inline-flex" href="#privacy">

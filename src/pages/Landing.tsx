@@ -180,26 +180,26 @@ export default function Landing({
       </div>
       <section id="how-it-works" className="how-section">
         <div className="section-intro">
-          <span className="eyebrow">THREE SIMPLE STEPS</span>
-          <h2>우리의 이야기를 만나는 방법</h2>
-          <p>복잡한 설정 없이, 대화 파일 하나로 시작하세요.</p>
+          <span className="eyebrow">HOW IT WORKS</span>
+          <h2>카카오톡 대화, 이렇게 가져오세요</h2>
+          <p>PC 카카오톡에서 대화 파일을 저장한 뒤 SaiLog에 올려주세요.</p>
         </div>
         <div className="steps-grid">
           {[
             {
               n: "01",
-              title: "대화 내보내기",
-              text: "카카오톡 채팅방 설정에서 대화 내용을 텍스트 파일로 저장해 주세요.",
+              title: "채팅방 메뉴 열기",
+              text: "PC 카카오톡에서 분석할 채팅방을 열고, 오른쪽 위의 메뉴를 클릭하세요.",
             },
             {
               n: "02",
-              title: "파일 선택하기",
-              text: "저장한 파일을 올리고 분석할 두 사람과 기간을 확인하세요.",
+              title: "대화 내용 저장하기",
+              text: "대화 내용 메뉴에서 대화 내보내기를 선택하고, 텍스트 파일을 컴퓨터에 저장하세요.",
             },
             {
               n: "03",
-              title: "연락 패턴 발견하기",
-              text: "대화량부터 답장 시간까지. 기록 속 두 사람의 리듬을 살펴보세요.",
+              title: "SaiLog에서 분석하기",
+              text: "저장한 파일을 SaiLog에 올린 뒤, 분석할 두 사람과 기간을 확인하고 분석을 시작하세요.",
             },
           ].map((step) => (
             <article key={step.n}>
@@ -209,6 +209,9 @@ export default function Landing({
             </article>
           ))}
         </div>
+        <a className="hero-anchor" href="#upload">
+          대화 파일 올리기 <ArrowRight size={16} aria-hidden="true" />
+        </a>
       </section>
       <section id="privacy" className="privacy-section">
         <div className="privacy-emblem">
