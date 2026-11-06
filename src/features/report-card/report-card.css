@@ -1,0 +1,160 @@
+/* The dialog follows app semantic tokens; the export canvas uses --report-* tokens. */
+.report-card-dialog {
+  width: min(820px, calc(100% - 32px));
+}
+.report-card-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  gap: 28px;
+  align-items: start;
+}
+.report-card-preview {
+  margin: 0;
+  padding: 12px;
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  background: var(--surface-soft);
+  min-width: 0;
+}
+.report-card-preview canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4 / 5;
+  border-radius: 8px;
+}
+.report-card-preview figcaption {
+  text-align: center;
+  margin-top: 8px;
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+.report-card-controls {
+  min-width: 0;
+}
+.report-card-privacy {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  color: var(--accent);
+  font-size: 0.8125rem;
+  margin-bottom: 22px;
+}
+.report-card-controls legend {
+  font-size: 0.8125rem;
+  font-weight: 550;
+  margin-bottom: 10px;
+}
+.report-card-styles {
+  display: flex;
+  gap: 8px;
+}
+.report-style {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 7px;
+  padding: 10px;
+  min-height: 44px;
+  border: 1px solid var(--control-border);
+  border-radius: 10px;
+  font-size: 0.8125rem;
+  cursor: pointer;
+}
+.report-style:hover {
+  background: var(--surface-soft);
+}
+.report-style.selected {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+.report-style input {
+  width: 14px;
+  height: 14px;
+  min-height: 14px;
+  margin: 0;
+  accent-color: var(--accent);
+}
+.report-swatch {
+  display: block;
+  height: 13px;
+  width: 13px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.swatch-rose {
+  background: var(--report-rose);
+}
+.swatch-lavender {
+  background: var(--report-lavender);
+}
+.report-names {
+  margin-top: 16px;
+}
+.report-card-help,
+.report-card-sample,
+.report-card-status {
+  color: var(--muted);
+  font-size: 0.75rem;
+  line-height: 1.8;
+}
+.report-card-help {
+  margin-bottom: 16px;
+}
+.report-card-summary {
+  padding: 14px 0;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  margin: 0 0 16px;
+}
+.report-card-summary > div {
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  padding: 4px 0;
+  font-size: 0.8125rem;
+}
+.report-card-summary dt {
+  color: var(--muted);
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.report-card-summary dd {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  font-weight: 550;
+}
+.report-card-sample {
+  color: var(--accent);
+  margin-bottom: 16px;
+}
+.report-card-status {
+  margin-top: 10px;
+}
+.dashboard-actions {
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+.dashboard-title > div:first-child {
+  min-width: 0;
+}
+@media (max-width: 767px) {
+  .report-card-layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 20px;
+  }
+  .report-card-preview {
+    max-width: 280px;
+    width: 100%;
+    margin-inline: auto;
+  }
+  .report-card-privacy {
+    margin-bottom: 16px;
+  }
+  .dashboard-actions {
+    justify-content: flex-start;
+  }
+  .metrics-grid > .metric-card:last-child {
+    grid-column: 1 / -1;
+  }
+}
