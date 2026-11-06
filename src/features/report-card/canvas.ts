@@ -1,4 +1,5 @@
-import { number, prettyDate } from "../../lib/date";
+import { prettyDate } from "../../lib/date";
+import { cardMetric, type CardMetric } from "./metrics";
 import type { ReportCardData } from "./model";
 
 export const CARD_SIZE = { width: 1080, height: 1350 };
@@ -91,6 +92,7 @@ export function drawReportCard(
   canvas: HTMLCanvasElement,
   data: ReportCardData,
   palette: Palette,
+  selected: CardMetric[],
 ) {
   canvas.width = CARD_SIZE.width;
   canvas.height = CARD_SIZE.height;
@@ -99,7 +101,7 @@ export function drawReportCard(
     throw new Error(
       "이 브라우저에서는 이미지를 만들 수 없어요. 다른 브라우저에서 다시 시도해 주세요.",
     );
-  const { paper, surface, ink, muted, border, accent, soft, second } = palette;
+  const { paper, surface, ink, muted, border, accent, soft } = palette;
   ctx.fillStyle = paper;
   ctx.fillRect(0, 0, 1080, 1350);
   // SaiLog's three strokes, carried over from the product wordmark.
@@ -143,78 +145,36 @@ export function drawReportCard(
     muted,
   );
 
-  rect(ctx, 80, 454, 920, 210, 28, surface);
-  text(ctx, "주고받은 메시지", 116, 508, 25, muted, 500);
-  text(ctx, `${number(data.total)}개`, 116, 613, 93, ink, 650);
-  // Two quiet, offset speech forms express dialogue without showing any source text.
-  rect(ctx, 810, 508, 96, 64, 20, soft);
-  rect(ctx, 858, 549, 96, 64, 20, border);
+  const gap = 18;
+  const height = (704 - gap * (selected.length - 1)) / selected.length;
+  selected.forEach((id, index) => {
+    const item = cardMetric(data, id);
+    const y = 454 + index * (height + gap);
+    rect(
+      ctx,
+      80,
+      y,
+      920,
+      height,
+      28,
+      index === selected.length - 1 ? soft : surface,
+    );
+    text(ctx, item.label, 116, y + 44, 25, muted, 500);
+    text(
+      ctx,
+      item.value,
+      116,
+      y + height * 0.68,
+      selected.length === 4 ? 42 : 52,
+      ink,
+      650,
+      "left",
+      840,
+    );
+    if (item.detail)
+      text(ctx, item.detail, 116, y + height - 22, 20, muted, 400, "left", 840);
+  });
 
-  rect(ctx, 80, 688, 920, 300, 28, surface);
-  text(ctx, "대화를 여는 첫마디", 116, 744, 27, ink, 600);
-  text(
-    ctx,
-    `${data.sessionHours}시간 이상 공백 후, 새 대화를 시작한 비율`,
-    116,
-    782,
-    21,
-    muted,
-  );
-  text(ctx, data.names[0], 116, 834, 25, accent, 500, "left", 380);
-  text(ctx, data.names[1], 964, 834, 25, second, 500, "right", 380);
-  text(
-    ctx,
-    data.starterPercent ? `${number(data.starterPercent[0])}%` : "기록 없음",
-    116,
-    888,
-    42,
-    ink,
-    600,
-  );
-  text(
-    ctx,
-    data.starterPercent ? `${number(data.starterPercent[1])}%` : "기록 없음",
-    964,
-    888,
-    42,
-    ink,
-    600,
-    "right",
-  );
-  rect(ctx, 116, 916, 848, 16, 8, data.starterPercent ? second : border);
-  if (data.starterPercent && data.starterPercent[0] > 0) {
-    ctx.save();
-    ctx.beginPath();
-    ctx.rect(116, 916, (848 * data.starterPercent[0]) / 100, 16);
-    ctx.clip();
-    rect(ctx, 116, 916, 848, 16, 8, accent);
-    ctx.restore();
-  }
-  text(ctx, `A · ${number(data.starts[0])}회`, 116, 966, 20, muted);
-  text(
-    ctx,
-    `B · ${number(data.starts[1])}회`,
-    964,
-    966,
-    20,
-    muted,
-    400,
-    "right",
-  );
-
-  rect(ctx, 80, 1012, 920, 146, 28, soft);
-  text(ctx, "최장 연속 연락", 116, 1065, 27, ink, 600);
-  text(ctx, "하루 한 번 이상 대화한 날이 이어진 기록", 116, 1110, 20, muted);
-  text(
-    ctx,
-    `${number(data.longestStreak)}일`,
-    964,
-    1105,
-    64,
-    accent,
-    600,
-    "right",
-  );
   text(
     ctx,
     data.limitedSample

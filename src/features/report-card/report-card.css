@@ -107,6 +107,26 @@
   border-bottom: 1px solid var(--border);
   margin: 0 0 16px;
 }
+.report-card-metrics {
+  margin: 20px 0;
+}
+.report-card-metric-options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px 12px;
+}
+.report-card-metric-options .check-field {
+  min-height: 44px;
+  font-size: 0.8125rem;
+}
+.report-card-summary small {
+  display: block;
+  font-size: 0.6875rem;
+}
+.report-card-summary dd {
+  white-space: normal;
+  text-align: right;
+}
 .report-card-summary > div {
   display: flex;
   gap: 12px;
@@ -121,7 +141,7 @@
 }
 .report-card-summary dd {
   font-variant-numeric: tabular-nums;
-  white-space: nowrap;
+  white-space: normal;
   font-weight: 550;
 }
 .report-card-sample {

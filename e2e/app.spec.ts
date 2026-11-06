@@ -135,6 +135,9 @@ test("PC two-digit-year export reaches the dashboard with Korea dates", async ({
     page.getByRole("heading", { name: "우리의 기록이 준비됐어요." }),
   ).toBeVisible();
   await expect(page.locator("input[name=start]")).toHaveValue("2025-12-31");
+  await expect(
+    page.getByRole("checkbox", { name: "참여자 이름을 가려서 확인하기" }),
+  ).not.toBeChecked();
   await expect(page.locator("input[name=end]")).toHaveValue("2026-01-01");
   await page.getByRole("button", { name: /분석 시작하기/ }).click();
   await expect(page.getByText("2개", { exact: true }).first()).toBeVisible();

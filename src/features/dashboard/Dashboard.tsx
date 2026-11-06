@@ -300,6 +300,7 @@ export default function Dashboard({
           <ReportCard
             report={report}
             sample={info.sample}
+            anonymous={anonymous}
             participantNames={
               report.options.participants.map(
                 (id) => info.participants.find((p) => p.id === id)!.name,

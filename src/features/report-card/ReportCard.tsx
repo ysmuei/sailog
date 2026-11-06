@@ -2,9 +2,15 @@ import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { Download, ImageDown, LoaderCircle, ShieldCheck } from "lucide-react";
 import { Modal } from "../../components/ui/Modal";
 import { Button } from "../../components/ui/Button";
-import { number } from "../../lib/date";
 import type { Report } from "../../types/chat";
 import { createReportCardData, reportCardFilename } from "./model";
+import {
+  CARD_METRICS,
+  DEFAULT_METRICS,
+  MAX_CARD_METRICS,
+  cardMetric,
+  type CardMetric,
+} from "./metrics";
 import {
   CARD_SIZE,
   canvasPng,
@@ -18,13 +24,14 @@ type Props = {
   report: Report;
   sample: boolean;
   participantNames: [string, string];
+  anonymous: boolean;
   disabled: boolean;
 };
 export function ReportCard({ disabled, ...props }: Props) {
   return (
     <Modal
       title="우리의 기록을 한 장에"
-      description="선택한 기간의 메시지 수·선톡 비율·최장 연속 연락일을 이미지로 간직하세요."
+      description="선택한 기간의 통계 중 카드에 담고 싶은 항목을 골라보세요."
       className="report-card-dialog"
       trigger={
         <Button disabled={disabled}>
@@ -40,9 +47,11 @@ function CardEditor({
   report,
   sample,
   participantNames,
+  anonymous,
 }: Omit<Props, "disabled">) {
-  const [includeNames, setIncludeNames] = useState(false),
+  const [includeNames, setIncludeNames] = useState(!anonymous),
     [style, setStyle] = useState<CardStyle>("rose");
+  const [selected, setSelected] = useState<CardMetric[]>(DEFAULT_METRICS);
   const [ready, setReady] = useState(false),
     [saving, setSaving] = useState(false),
     [error, setError] = useState(""),
@@ -71,7 +80,7 @@ function CardEditor({
     (document.fonts?.ready ?? Promise.resolve()).then(() => {
       if (cancelled || !canvas.current) return;
       try {
-        drawReportCard(canvas.current, data, cardPalette(style));
+        drawReportCard(canvas.current, data, cardPalette(style), selected);
         setReady(true);
       } catch (e) {
         setError(
@@ -84,7 +93,7 @@ function CardEditor({
     return () => {
       cancelled = true;
     };
-  }, [data, style]);
+  }, [data, style, selected]);
   function editing() {
     setReady(false);
     setError("");
@@ -134,7 +143,7 @@ function CardEditor({
         <div className="report-card-privacy">
           <ShieldCheck size={17} aria-hidden="true" />
           <span>
-            {includeNames ? "이름 포함 · 원문 제외" : "기본 익명화 · 원문 제외"}
+            {includeNames ? "이름 포함 · 원문 제외" : "익명화 · 원문 제외"}
           </span>
         </div>
         <fieldset disabled={saving}>
@@ -181,31 +190,53 @@ function CardEditor({
             포함되지 않아요.
           </p>
         </fieldset>
+        <fieldset className="report-card-metrics" disabled={saving}>
+          <legend>카드에 담을 항목</legend>
+          <p className="report-card-help">
+            최소 1개, 최대 4개까지 선택할 수 있어요. ({selected.length}/4)
+          </p>
+          <div className="report-card-metric-options">
+            {CARD_METRICS.map(({ id, label }) => (
+              <label className="check-field" key={id}>
+                <input
+                  type="checkbox"
+                  checked={selected.includes(id)}
+                  disabled={
+                    (selected.length === 1 && selected.includes(id)) ||
+                    (selected.length === MAX_CARD_METRICS &&
+                      !selected.includes(id))
+                  }
+                  onChange={(event) => {
+                    const checked = event.target.checked;
+                    editing();
+                    setSelected((current) =>
+                      checked
+                        ? CARD_METRICS.map((metric) => metric.id).filter(
+                            (metric) =>
+                              metric === id || current.includes(metric),
+                          )
+                        : current.filter((metric) => metric !== id),
+                    );
+                  }}
+                />
+                {label}
+              </label>
+            ))}
+          </div>
+        </fieldset>
         <dl id={summaryId} className="report-card-summary">
-          <div>
-            <dt>주고받은 메시지</dt>
-            <dd>{number(data.total)}개</dd>
-          </div>
-          <div>
-            <dt>{data.names[0]} 선톡</dt>
-            <dd>
-              {data.starterPercent
-                ? `${number(data.starterPercent[0])}%`
-                : "기록 없음"}
-            </dd>
-          </div>
-          <div>
-            <dt>{data.names[1]} 선톡</dt>
-            <dd>
-              {data.starterPercent
-                ? `${number(data.starterPercent[1])}%`
-                : "기록 없음"}
-            </dd>
-          </div>
-          <div>
-            <dt>최장 연속 연락</dt>
-            <dd>{number(data.longestStreak)}일</dd>
-          </div>
+          {selected.map((id) => {
+            const metric = cardMetric(data, id);
+            return (
+              <div key={id}>
+                <dt>
+                  {metric.label}
+                  {metric.detail && <small> {metric.detail}</small>}
+                </dt>
+                <dd>{metric.value}</dd>
+              </div>
+            );
+          })}
         </dl>
         {sample && (
           <p className="report-card-sample">

@@ -22,7 +22,7 @@ export default function App() {
   const analysis = useAnalysis();
   const [dark, setDark] = useState(initialDark);
   const [home, setHome] = useState(false);
-  const [anonymous, setAnonymous] = useState(true);
+  const [anonymous, setAnonymous] = useState(false);
   useEffect(() => {
     document.documentElement.dataset.theme = dark ? "dark" : "light";
     document

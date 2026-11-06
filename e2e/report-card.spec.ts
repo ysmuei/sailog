@@ -57,7 +57,15 @@ test("report card exports a real anonymous PNG and reflects selected statistics"
   const dialog = page.getByRole("dialog");
   await expect(
     dialog.getByRole("checkbox", { name: "참여자 이름 표시" }),
-  ).not.toBeChecked();
+  ).toBeChecked();
+  await expect(
+    dialog.getByRole("button", { name: "PNG 이미지 저장" }),
+  ).toBeEnabled();
+  await page.evaluate(() => {
+    (globalThis as typeof globalThis & { __cardTexts: string[] }).__cardTexts =
+      [];
+  });
+  await dialog.getByRole("checkbox", { name: "참여자 이름 표시" }).uncheck();
   await expect(dialog.locator("dl")).toContainText(total);
   await expect(
     dialog.getByRole("button", { name: "PNG 이미지 저장" }),
@@ -68,12 +76,29 @@ test("report card exports a real anonymous PNG and reflects selected statistics"
     () =>
       (globalThis as typeof globalThis & { __cardTexts: string[] }).__cardTexts,
   );
-  expect(labels).toContain("참여자 A");
-  expect(labels).toContain("참여자 B");
+  expect(labels.some((label) => label.includes("참여자 A"))).toBe(true);
+  expect(labels.some((label) => label.includes("참여자 B"))).toBe(true);
   expect(labels).toContain("가상 샘플 리포트");
   expect(labels).not.toContain("서연");
   expect(labels).not.toContain("도윤");
   expect(labels).not.toContain("오늘 하루 어땠어?");
+  await page.evaluate(() => {
+    (globalThis as typeof globalThis & { __cardTexts: string[] }).__cardTexts =
+      [];
+  });
+  await dialog
+    .getByRole("checkbox", { name: "메시지 수", exact: true })
+    .uncheck();
+  await dialog.getByRole("checkbox", { name: "평균 답장 시간" }).check();
+  await expect(
+    dialog.getByRole("button", { name: "PNG 이미지 저장" }),
+  ).toBeEnabled();
+  const selectedLabels = await page.evaluate(
+    () =>
+      (globalThis as typeof globalThis & { __cardTexts: string[] }).__cardTexts,
+  );
+  expect(selectedLabels).toContain("평균 답장 시간");
+  expect(selectedLabels).not.toContain("주고받은 메시지");
   const downloadReady = page.waitForEvent("download");
   await dialog.getByRole("button", { name: "PNG 이미지 저장" }).click();
   const download = await downloadReady;
@@ -143,10 +168,22 @@ test("card controls work on mobile and dark mode, reset to anonymity, and handle
           .data,
       ]),
   ).toEqual([250, 249, 247, 255]);
-  await dialog.getByRole("checkbox", { name: "참여자 이름 표시" }).check();
+  await dialog.getByRole("checkbox", { name: "참여자 이름 표시" }).uncheck();
   await expect(save).toBeEnabled();
-  await expect(dialog.locator("dl")).toContainText("서연 선톡");
-  await expect(dialog.locator("dl")).toContainText("도윤 선톡");
+  await expect(dialog.locator("dl")).toContainText("참여자 A");
+  await expect(dialog.locator("dl")).toContainText("참여자 B");
+  await dialog
+    .getByRole("checkbox", { name: "메시지 수", exact: true })
+    .uncheck();
+  await dialog.getByRole("checkbox", { name: "평균 답장 시간" }).check();
+  await dialog.getByRole("checkbox", { name: "대화를 나눈 날" }).check();
+  await expect(save).toBeEnabled();
+  await expect(dialog.locator("dl")).toContainText("평균 답장 시간");
+  await expect(dialog.locator("dl")).toContainText("대화를 나눈 날");
+  await expect(dialog.locator("dl")).not.toContainText("주고받은 메시지");
+  await expect(
+    dialog.getByRole("checkbox", { name: "가장 활발한 시간대" }),
+  ).toBeDisabled();
   await dialog.screenshot({ path: "test-results/report-card-mobile-dark.png" });
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
   expect(
@@ -160,7 +197,7 @@ test("card controls work on mobile and dark mode, reset to anonymity, and handle
     .click();
   await expect(
     dialog.getByRole("checkbox", { name: "참여자 이름 표시" }),
-  ).not.toBeChecked();
+  ).toBeChecked();
   await expect(dialog.getByRole("radio", { name: "로즈" })).toBeChecked();
   await expect(save).toBeEnabled();
   await dialog.locator("canvas").evaluate((el) => {

@@ -16,7 +16,7 @@ export function Settings({
   onCancel: () => void;
 }) {
   const [error, setError] = useState(""),
-    [anonymous, setAnonymous] = useState(!info.sample);
+    [anonymous, setAnonymous] = useState(false);
   return (
     <section className="setup-screen">
       <div className="setup-intro">

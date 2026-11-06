@@ -9,6 +9,10 @@ export type ReportCardData = {
   end: string;
   total: number;
   longestStreak: number;
+  activeDays: number;
+  averageReply: number | null;
+  peakHour: number | null;
+  sessions: number;
   sessionHours: number;
   starts: [number, number];
   starterPercent: [number, number] | null;
@@ -41,6 +45,10 @@ export function createReportCardData(
     end: report.options.end,
     total: report.total,
     longestStreak: report.longestStreak,
+    activeDays: report.activeDays,
+    averageReply: report.averageReply,
+    peakHour: report.peakHour,
+    sessions: report.sessions,
     sessionHours: report.options.sessionHours,
     starts,
     starterPercent: sessions
